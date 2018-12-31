@@ -1,0 +1,25 @@
+# depslib dependency file v1.0
+1545693899 source:c:\users\user\desktop\test\tjsmn\jsmn.c
+	"jsmn.h"
+
+1545693872 c:\users\user\desktop\test\tjsmn\jsmn.h
+	<stddef.h>
+
+1545694201 source:c:\users\user\desktop\test\tjsmn\main.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	"jsmn.h"
+
+1545693899 source:f:\dic 1\projects\sgbd\xj\jsmn\jsmn.c
+	"jsmn.h"
+
+1545693872 f:\dic 1\projects\sgbd\xj\jsmn\jsmn.h
+	<stddef.h>
+
+1546258084 source:f:\dic 1\projects\sgbd\xj\jsmn\main.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	"jsmn.h"
+
