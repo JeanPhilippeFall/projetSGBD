@@ -1,0 +1,30 @@
+<svg width='1024px' height='1024px' xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink'>
+    <rect fill='#00BFFF' stroke='#000000' stroke-width='4px' width='180' height='80' y='20' x='200' ry='0' rx='0' />
+    <text x='200' y = '40' font-family='sans-serif' stroke='#000000' fill='#000000' font-size='16px'>name</text>
+    <line stroke='#000000' stroke-width='2px' y2='45' x2='380' y1='45' x1='200' />
+    <text x='200' y = '60' font-family='sans-serif' stroke='#000000' fill='#000000' font-size='16px'>Ndoye</text>
+    <rect fill='#00BFFF' stroke='#000000' stroke-width='4px' width='180' height='80' y='20' x='400' ry='0' rx='0' />
+    <text x='400' y = '40' font-family='sans-serif' stroke='#000000' fill='#000000' font-size='16px'>website</text>
+    <line stroke='#000000' stroke-width='2px' y2='45' x2='580' y1='45' x1='400' />
+    <text x='400' y = '60' font-family='sans-serif' stroke='#000000' fill='#000000' font-size='16px'>https://ww.dean.com</text>
+    <rect fill='#00BFFF' stroke='#000000' stroke-width='4px' width='180' height='80' y='20' x='600' ry='0' rx='0' />
+    <text x='600' y = '40' font-family='sans-serif' stroke='#000000' fill='#000000' font-size='16px'>github</text>
+    <line stroke='#000000' stroke-width='2px' y2='45' x2='780' y1='45' x1='600' />
+    <text x='600' y = '60' font-family='sans-serif' stroke='#000000' fill='#000000' font-size='16px'>https://github.com/driss</text>
+    <rect fill='#00BFFF' stroke='#000000' stroke-width='4px' width='180' height='80' y='120' x='200' ry='0' rx='0' />
+    <text x='200' y = '140' font-family='sans-serif' stroke='#000000' fill='#000000' font-size='16px'>turnscoffeintocommits</text>
+    <line stroke='#000000' stroke-width='2px' y2='145' x2='380' y1='145' x1='200' />
+    <text x='200' y = '160' font-family='sans-serif' stroke='#000000' fill='#000000' font-size='16px'>yes</text>
+    <rect fill='#00BFFF' stroke='#000000' stroke-width='4px' width='180' height='80' y='120' x='400' ry='0' rx='0' />
+    <text x='400' y = '140' font-family='sans-serif' stroke='#000000' fill='#000000' font-size='16px'>full</text>
+    <line stroke='#000000' stroke-width='2px' y2='145' x2='580' y1='145' x1='400' />
+    <text x='400' y = '160' font-family='sans-serif' stroke='#000000' fill='#000000' font-size='16px'>fill</text>
+    <rect fill='#00BFFF' stroke='#000000' stroke-width='4px' width='180' height='80' y='120' x='600' ry='0' rx='0' />
+    <text x='600' y = '140' font-family='sans-serif' stroke='#000000' fill='#000000' font-size='16px'>with</text>
+    <line stroke='#000000' stroke-width='2px' y2='145' x2='780' y1='145' x1='600' />
+    <text x='600' y = '160' font-family='sans-serif' stroke='#000000' fill='#000000' font-size='16px'>dumb</text>
+    <rect fill='#00BFFF' stroke='#000000' stroke-width='4px' width='180' height='80' y='220' x='200' ry='0' rx='0' />
+    <text x='200' y = '240' font-family='sans-serif' stroke='#000000' fill='#000000' font-size='16px'>text</text>
+    <line stroke='#000000' stroke-width='2px' y2='245' x2='380' y1='245' x1='200' />
+    <text x='200' y = '260' font-family='sans-serif' stroke='#000000' fill='#000000' font-size='16px'>only</text>
+</svg>
