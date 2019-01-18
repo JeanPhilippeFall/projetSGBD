@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include<windows.h>
+//#include<windows.h>
 #include"cJSON.h"
 #include"svg.h"
 
@@ -65,7 +65,7 @@ void treatJson(char* filepath, char* outputName){
         int i;
         printf("demarrage de l'extraction");
         for(i=0;i<3;i++){
-            Sleep(1000);
+           sleep(1000);
             printf(".");
         }
 
