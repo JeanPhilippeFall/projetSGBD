@@ -1,152 +1,217 @@
-/*
-	Projet SGBD-2019
-	Création d'outil de conversion de fichier xml/json en fichier .svg avec tracé des entités,
-	des relations et des attributs de entités.
-*/
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
-#include<libxml/tree.h>
-#include<libxml/parser.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <libxml/parser.h>
+#include<math.h>
+#include<time.h>
+#include"cJSON.h"
+#include"svg.h"
 
-int verifParam1(char p1[]){
-	if (strcmp(p1, "-i") == 0)
-		return 1;
-	else 
-		return 0;
+/**********************************************************************/
+#define N 500
+#define SVG_WIDTH 1024
+#define SVG_HEIGHT 1024
+#define WINDOW_WIDTH 180
+#define WINDOW_HEIGHT 80
+/***************************************************/
+
+void treatChild(cJSON* element){ // pass the main child element (root of the new branch)
+    int i;
+    while(element!=NULL){
+        printf("\n%s",(element->valuestring));
+        printf("%s\n",(element->string));
+        element=element->child;
+    }
 }
 
-int verifParam2(char p2[]) 
+/***************************************************/
+
+char* readfile(char* filepath){
+    char* fileContent=(char*)malloc(N*sizeof(char));
+    FILE *f;
+    char c;
+    int index=0;
+    f = fopen(filepath, "r");
+    if(f==NULL){
+        printf("erreur: impossible d'ouvrir le fichier");
+        exit(0);
+    }else{
+        while((c = fgetc(f)) != EOF){
+            fileContent[index] = c;
+            index++;
+        }
+        fileContent[index] = '\0';
+    }
+
+    fclose(f);
+    return fileContent;
+}
+
+
+/***************************************************/
+
+
+void treatJson(char* filepath, char* outputName){
+    char* fileName=filepath;
+    char* fileContent=readfile(fileName);
+    cJSON* json=cJSON_Parse(fileContent);
+
+//    printf("formatted: %s",cJSON_Print(json));
+    int size=cJSON_GetArraySize(json);
+
+//    printf("number of element:%d\n",size);
+
+    if(size==0){
+        printf("veuillez verifier la validite du fichier");
+    }else{
+        // file had been well read
+        int i;
+        printf("demarrage de l'extraction");
+        for(i=0;i<3;i++){
+           //sleep(1000);
+            printf(".");
+        }
+
+        cJSON* myJson[size];
+
+        for(i=0;i<size;i++){
+            myJson[i]=cJSON_GetArrayItem(json,i);
+        }
+
+        for(i=0;i<size;i++){
+            printf("\n%s:%s",myJson[i]->string,cJSON_GetStringValue(myJson[i]));
+       
+        }
+
+        svg* mySvg;
+        mySvg = svg_create(SVG_WIDTH, SVG_HEIGHT);
+
+        if(mySvg == NULL){
+            puts("mySvg is NULL");
+        }else{
+
+            int i,x=0,y=20;
+            for(i=0;i<size;i++){
+                x+=200;
+                if(x>=800){
+                    x=200;
+                    y+=100;
+                }
+                svg_rectangle(mySvg, WINDOW_WIDTH, WINDOW_HEIGHT, x, y, "#00BFFF", "#000000", 4, 0, 0);
+                svg_text(mySvg, x, y+20, "sans-serif", 16, "#000000", "#000000", myJson[i]->string);
+                svg_line(mySvg, "#000000", 2, x,y+25, x+WINDOW_WIDTH, y+25);
+                svg_text(mySvg, x, y+40, "sans-serif", 16, "#000000", "#000000", cJSON_GetStringValue(myJson[i]));
+            }
+            svg_finalize(mySvg);
+            svg_save(mySvg, outputName);
+            svg_free(mySvg);
+            printf("\n fin du processus.\n Fichier %s genere avec succes\n",outputName);
+            //Sleep(2000);
+            system(outputName);
+        }
+    }
+}
+
+
+
+/*********************************************************************/
+// declaration de la fonction parcourir qui permet de parcourir les noeuds et ensuite afficher leur valeur
+void parcourir(xmlNode * a_node)
 {
-	if (strcmp(p2, "xml") == 0)
-		return 1;
-	else return 0;
+    xmlNode *cur_node = NULL;
+
+    for (cur_node = a_node; cur_node; cur_node = cur_node->next)
+    {
+               char *retour;
+                if(strcmp((const char *)cur_node->name,(const char *)"produit") == 0){
+                 xmlChar *a = xmlNodeGetContent(cur_node);
+                        printf("Produit-> %s\n", a);
+			retour = a;
+                        }
+             else if(strcmp((const char *)cur_node->name,(const char *)"prix") == 0)  {
+                    xmlChar *b = xmlNodeGetContent(cur_node);
+                        printf("\tPrix->%s\n", b);
+                        retour = b;
+                        }
+        parcourir(cur_node->children);
+	
+    }
 }
 
-int verifParam3(char p3[]){
-	if (strcmp(p3, "-t") == 0) 
-		return 1;
-	else return 0;
+void drawrectangles(char *nom)
+{
+    svg* psvg;
+    psvg = svg_create(1024, 1024);
+
+    if(psvg == NULL)
+    {
+        puts("Ereur de création du fichier svg");
+    }
+    else
+    {
+	svg_rectangle(psvg, 1024, 1024, 0, 0, "#00FF00", "#000000", 4, 0, 0);
+        svg_rectangle(psvg, 100, 100, 24, 10, "#C0C0FF", "black", 1, 0, 0);
+        svg_finalize(psvg);
+        svg_save(psvg, nom);
+	svg_print(psvg);
+        svg_free(psvg);
+    }
 }
 
-int verifParam4(char p4[]){
-	if (strcmp(p4, "-f") == 0)
-		return 1;
-	else return 0;
-}
+int main(int argc, char **argv)
+{
+    xmlDocPtr doc;
+    xmlNode *racine = NULL;
+/*
+Le nombre d'arguments passés en paramètres ne doit se différencier de 8
+nom du fichier
+-i 
+xml/json
+-t
+-f
+nom de l'executable
+-o 
+nom du fichier svg
 
-xmlNodePtr creer_produit(const char *reference, const char *intitule, const char *prix) {
-    xmlNodePtr noeud_produit;
-    xmlNodePtr noeud_intitule;
-
-    // Création du noeud "produit"
-    if ((noeud_produit = xmlNewNode(NULL, BAD_CAST "produit")) == NULL) {
-        return NULL;
+*/
+    if (argc != 8)
+    {
+        printf("Nombre d'arguments invalides, veuillez bien spécifier les aruments\n");
+        return(1);
     }
-    // Ajout de son attribut "reference"
-    if (xmlSetProp(noeud_produit, BAD_CAST "reference", BAD_CAST reference) == NULL) {
-        xmlFreeNode(noeud_produit);
-        return NULL;
+/*
+dans cette partie on s'occupe du cas d'un fichier XML
+
+*/
+    if(strcmp(argv[2],"xml")==0){
+        doc = xmlReadFile(argv[5], NULL, XML_PARSE_NOBLANKS | XML_PARSE_NOERROR | XML_PARSE_NOWARNING | XML_PARSE_NONET);
+        if (doc == NULL)
+        {
+            fprintf(stderr, "Votre fichier n'est pas valide car il ne peut être parsé.\n");
+            return 0;
+        }
+
+        racine = xmlDocGetRootElement(doc);
+  
+        if (racine == NULL)
+     {
+            fprintf(stderr, "Votre Document XML est vide\n");
+            xmlFreeDoc(doc);
+            return 0;
+        }
+
+        parcourir(racine);
+        drawrectangles(argv[7]);
+
+        xmlFreeDoc(doc);       
+        xmlCleanupParser();   
+    }else if (strcmp(argv[2],"json")==0){
+        char* filepath=argv[5];
+        char* output=argv[7];
+        treatJson(filepath,output);
     }
-    // Création du noeud intitule
-    if ((noeud_intitule = xmlNewNode(NULL, BAD_CAST "intitule")) == NULL) {
-        xmlFreeNode(noeud_produit);
-        return NULL;
-    }
-    xmlNodeSetContent(noeud_intitule, BAD_CAST intitule);
-    // Ajout du noeud (intitule) à son père (produit)
-    if (xmlAddChild(noeud_produit, noeud_intitule) == NULL) {
-        xmlFreeNode(noeud_produit);
-        xmlFreeNode(noeud_intitule);
-        return NULL;
-    }
-    // Equivalent plus rapide par rapport au noeud intitule
-    // Création du noeud "prix" et ajout à son père (produit)
-    if (xmlNewTextChild(noeud_produit, NULL, BAD_CAST "prix", BAD_CAST prix) == NULL) {
-        xmlFreeNode(noeud_produit);
-        return NULL;
-    }
-
-    return noeud_produit;
-}
-
-/**
- * Retourne le premier produit du catalogue (sinon NULL)
- **/
-xmlNodePtr obtenir_premier_produit(xmlDocPtr doc) {
-	// pour l'implémentation voir les sources
-}
+	else printf("Veuillez choisir un fichier XML/JSON PLEASE!\n");
 
 
-int main(int argc, char *argv[])
-{	
-  /** ... **/
- 	xmlDocPtr doc;
-	xmlNodePtr racine, premier_prod, nouv_prod;
-
-	/*
-xmlParseFile permet de parser le fichier .xml et stocker le resultat sous forme d'arbre si le document est bien valide, sinon (le document xml est invalide) le résultat sera null
-	*/
-		
-   if (verifParam1(argv[1]) && verifParam2(argv[2]) && verifParam3(argv[3]) && verifParam4(argv[4]))
-   {
-	doc = xmlParseFile(argv[5]);
-	// Ouverture du fichier XML
-    	xmlKeepBlanksDefault(0);
-    	doc = xmlParseFile(argv[5]);
-	    if (doc == NULL) {
-		fprintf(stderr, "Document XML invalide\n");
-		return EXIT_FAILURE;
-	    }
-	    // Récupération de la racine
-	    racine = xmlDocGetRootElement(doc);
-	    if (racine == NULL) {
-		fprintf(stderr, "Document XML vierge\n");
-		xmlFreeDoc(doc);
-		return EXIT_FAILURE;
-	    }
-	    // Récupération du premier produit
-	    premier_prod = obtenir_premier_produit(doc);
-	    if (premier_prod == NULL) {
-		fprintf(stderr, "Impossible de trouver le premier produit\n");
-		xmlFreeDoc(doc);
-		return EXIT_FAILURE;
-	    }
-	    // Ajout d'un nouveau produit avant le premier produit (en tête)
-	    nouv_prod = creer_produit("CD0YAH", "Autocollant Developpez.com", "0.80");
-	    if (nouv_prod) {
-		xmlAddPrevSibling(premier_prod, nouv_prod);
-	    }
-	    // Ajout d'un nouveau produit après le premier produit
-	    nouv_prod = creer_produit("U0TZ6K", "Lot de 10 autocollants Developpez.com", "5.00");
-	    if (nouv_prod) {
-		xmlAddPrevSibling(premier_prod, nouv_prod);
-	    }
-	    // Ajout d'un nouveau produit en fin/queue
-	    nouv_prod = creer_produit("ZQEYAN", "Mug Developpez.com", "4.00");
-	    if (nouv_prod) {
-		xmlAddSibling(premier_prod, nouv_prod);
-	    }
-	    // Affichage de l'arbre DOM tel qu'il est en mémoire
-	    xmlDocFormatDump(stdout, doc, 1);
-	    // Libération de la mémoire
-	    xmlFreeDoc(doc);
-
-    return EXIT_SUCCESS;
-	/*}
-	else {
-		printf("Erreur de parsing : Fichier XML non valide!\n");
-		exit(EXIT_FAILURE);
-	}
-	*/
-   }
-	else
-	{
-	printf("Erreur de paramétrage! Paramètres manquants ou non pris en compte!\n"); 
-      	exit(EXIT_FAILURE);
-	}
- 
-  /** ... **/
- 
-  return 0;
+    return 0;
 }
